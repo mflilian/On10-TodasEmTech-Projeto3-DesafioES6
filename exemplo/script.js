@@ -1,11 +1,11 @@
 // URL da API
-const baseURL = "https://www.breakingbadapi.com/api";
+const baseURL = "https://api.github.com";
 
 const form = document.querySelector('form');
 const input = document.querySelector('#nomePersonagem');
 
 const imgPersonagem = document.querySelector('#imagem');
-const nomePersonagem = document.querySelector('#nome');
+const nomePersonagem = document.querySelector('#name');
 const apelidPersonagem = document.querySelector('#apelido');
 const niverPersonagem = document.querySelector('#niver');
 const mensagemErro = document.querySelector('.messagemErro');
@@ -35,42 +35,52 @@ function replaceNome(nome){
 }
 
 
-
 const getPersonagem = (nome) => {
 
   const nomeModificado = replaceNome(nome)
 
-  fetch(`${baseURL}/characters?name=${nomeModificado}`)
+  fetch(`${baseURL}/users/${nomeModificado}`)
   .then((resposta) => resposta.json())
   .then((dados) => {
-    mensagemErro.textContent = '';
-    if(dados.length > 0){
-
-    const personagem = dados[0];
-    const { img, nickname, birthday, name } = personagem;
-    criarCard(img, nickname, birthday, name)
-    } else {
+    if(dados.message == "Not Found") {
       throw new Error()
     }
+
+    else {
+    mensagemErro.textContent = '';
+
+    const avatar_url = dados.avatar_url;
+
+    const name = dados.name;
+
+    const followers = dados.followers;
+
+    const bio = dados.bio;
+
+    criarCard(avatar_url, name, followers, bio)
+};
+    //name login followers bio
+
   }).catch(() => {
     limparCard();
-    mensagemErro.textContent = 'Personagem não encontrado';
+    document.getElementById("mensagemErro").src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png';
+
   })
 
 }
 
-const criarCard = (img, nome, apelido, niver) => {
- imgPersonagem.setAttribute('src', img);
+const criarCard = (avatar_url, name, followers, bio) => {
+ imgPersonagem.setAttribute('src', avatar_url);
  // imgPersonagem.src = img
- nomePersonagem.textContent = nome;
+ nomePersonagem.textContent = name;
  // nomePersonagem.innerText = nome;
 
- apelidPersonagem.textContent = `Apelido: ${apelido}`;
- niverPersonagem.textContent = `Aniversário: ${niver}`;
+ apelidPersonagem.textContent = `Nome: ${name}`;
+ niverPersonagem.textContent = `Bio: ${bio}`;
 }
 
 const limparCard = () => {
-  imgPersonagem.src = ' ';
+ imgPersonagem.src = ' ';
  nomePersonagem.textContent = '';
  apelidPersonagem.textContent = '';
  niverPersonagem.textContent = '';
